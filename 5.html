@@ -63,8 +63,8 @@
             const value1 = document.querySelector('#input-1').value;
             const value2 = document.querySelector('#input-2').value;
             let errorLog = '';
-            errorLog = ((typeof value1 == "number") || (value1 < 100 || value1 > 500)) ? 'Ширина картинки вне диапазона от 100 до 500<br>' : ''; 
-            errorLog += ((typeof value2 == "number") || (value2 < 100 || value1 > 500)) ? 'Высота картинки вне диапазона от 100 до 500' : '';
+            errorLog = ((typeof value1 == "number") || (value1 < 1 || value1 > 10)) ? 'Ширина картинки вне диапазона от 100 до 500<br>' : ''; 
+            errorLog += ((typeof value2 == "number") || (value2 < 1 || value1 > 10)) ? 'Высота картинки вне диапазона от 100 до 500' : '';
             div.innerHTML = errorLog;
 
             if (!errorLog){
