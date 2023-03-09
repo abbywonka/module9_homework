@@ -5,40 +5,72 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        .card-image {
+            display: block;
+        }
+        .card, .btn {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
     <form>        
-        <label>Первое число<input type="text" name="value1" id="input-1" placeholder="Первое число"></label>
-        <label>Второе число<input type="text" name="value2" id="input-2" placeholder="Второе число"></label>
+        <label>ширина картинки: <input type="text" name="value1" id="input-1" placeholder="число"></label>
+        <label>высота картинки: <input type="text" name="value2" id="input-2" placeholder="число"></label>
     </form>
-    <button>Action</button>
+    <button class="btn">Запрос</button>
     <div id="container"></div>
 
     <script>
 
         const div = document.getElementById("container");
         const btn = document.querySelector("button");
+        let cards = '';
+        cards = localStorage.getItem("cards");
+        if (cards){
+            div.innerHTML = cards;
+        };
 
-        const useRequest = (value1, value2) => {
-            return fetch(`https://loremflickr.com/json/g/${value1}/${value2}/all`)
+        const useRequest = (imageWidth, imageHeight, randomNumber) => {
+            return fetch(`https://source.unsplash.com/collection/928423/${imageWidth}x${imageHeight}/?sig=${randomNumber}`)
             .then((response) => {
-                return response.json();
+                return response.url;
             })
-            .then((json) => { return json; })
+            .then((url) => { return url; })
             .catch(() => { console.log('error') });
         };
 
-        btn.addEventListener("click", async () => {
+        async function displayResult(value1, value2){
+            const numImagesAvailable = 10;
+                let randomNumber = Math.floor(Math.random() * numImagesAvailable);
+                let apiData = '';
+                cards = '';
+                for(let i = 0; i < numImagesAvailable; i++){
+                    apiData = await useRequest(value1, value2, randomNumber);
+                    cards += `
+                        <div class="card">
+                            <img src="${apiData}" class="card-image"/>
+                        </div>
+                    `;
+                }       
+            localStorage.removeItem('cards');
+            localStorage.setItem('cards', cards);                    
+            div.innerHTML = cards;
+        }
+       
+        btn.addEventListener("click", () => {
             const value1 = document.querySelector('#input-1').value;
             const value2 = document.querySelector('#input-2').value;
-            if ((value1 < 100 || value1 > 500) || (value2 < 100 || value2 > 500)){
-                div.innerHTML = 'число вне диапазона от 100 до 500';
-            }else{
-                let apiData = await useRequest(value1, value2);
-                div.innerHTML = `<img src="${apiData.file}">`;
-            }
-        });
+            let errorLog = '';
+            errorLog = ((typeof value1 == "number") || (value1 < 100 || value1 > 500)) ? 'Ширина картинки вне диапазона от 100 до 500<br>' : ''; 
+            errorLog += ((typeof value2 == "number") || (value2 < 100 || value1 > 500)) ? 'Высота картинки вне диапазона от 100 до 500' : '';
+            div.innerHTML = errorLog;
 
+            if (!errorLog){
+                displayResult(value1, value2);
+            };
+        });
     </script>
 
 </body>
